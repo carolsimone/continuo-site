@@ -1,0 +1,35 @@
+---
+import { site } from '../../site.config';
+
+const commands = [
+  'kind create cluster --name continuo',
+  `helm install continuo oci://ghcr.io/carolsimone/charts/continuo \\\n  --version ${site.chartVersion} -n continuo --create-namespace`,
+].join('\n');
+---
+<div class="quick__body">
+  <pre class="log-block" data-quickstart set:text={commands} />
+  <div class="quick__actions">
+    <button class="btn btn--secondary" type="button" data-copy>Copy</button>
+    <slot />
+  </div>
+</div>
+
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    btn.addEventListener('click', async () => {
+      const pre = btn.closest('.quick__body')?.querySelector('[data-quickstart]');
+      if (!pre) return;
+      try {
+        await navigator.clipboard.writeText(pre.textContent ?? '');
+      } catch {
+        return;
+      }
+      btn.classList.add('is-success');
+      btn.textContent = 'Copied';
+      setTimeout(() => {
+        btn.classList.remove('is-success');
+        btn.textContent = 'Copy';
+      }, 3000);
+    });
+  }
+</script>

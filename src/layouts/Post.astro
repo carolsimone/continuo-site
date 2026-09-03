@@ -1,0 +1,38 @@
+---
+import Base from './Base.astro';
+import AuthorBox from '../components/AuthorBox.astro';
+import Quickstart from '../components/Quickstart.astro';
+import VideoSlot from '../components/VideoSlot.astro';
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import readingTime from 'reading-time';
+import { site } from '../../site.config';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const minutes = Math.max(1, Math.round(readingTime(post.body ?? '').minutes));
+const date = post.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base title={post.data.title} description={post.data.description}>
+  <article class="article">
+    <div class="meta">{date} · {minutes} min read</div>
+    <h1>{post.data.title}</h1>
+    {post.data.video && <VideoSlot id={post.data.video} />}
+    <Content />
+    <AuthorBox />
+    <div class="card cta">
+      <div class="section-header">
+        <div class="section-header__main"><span class="section-header__title">Run it yourself</span></div>
+        <div class="section-header__sub">Ten minutes to an empty Continuo</div>
+      </div>
+      <Quickstart>
+        <a class="btn btn--secondary" href="/docs/try-it-locally/">Try it locally</a>
+        <a class="btn btn--secondary" href={site.githubUrl}>Star on GitHub ↗</a>
+      </Quickstart>
+    </div>
+  </article>
+</Base>

@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import readingTime from 'reading-time';
+
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const minutes = (body: string | undefined) => Math.max(1, Math.round(readingTime(body ?? '').minutes));
+const tagline = 'Data pipelines are deployed without a release process. Each piece proves one chapter.';
+---
+<Base title="Blog" description={tagline}>
+  <div class="page-title">
+    <h1>Blog</h1>
+    <p>{tagline}</p>
+  </div>
+  <div class="card rows">
+    {posts.map((p) => (
+      <a class="row" href={`/blog/${p.id}/`}>
+        <div class="row__meta"><span>{fmt(p.data.date)}</span><span>{minutes(p.body)} min read</span></div>
+        <div>
+          <p class="row__title">{p.data.title}</p>
+          <p class="row__sum">{p.data.description}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</Base>

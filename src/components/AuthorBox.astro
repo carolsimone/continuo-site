@@ -1,0 +1,11 @@
+---
+import { site } from '../../site.config';
+const initials = site.author.name.split(' ').map((w) => w[0]).join('');
+---
+<div class="card author">
+  <div class="author__avatar" aria-hidden="true">{initials}</div>
+  <div>
+    <p class="author__name">{site.author.name}</p>
+    <p class="author__bio">{site.author.bio} <a href={site.linkedinUrl}>LinkedIn</a> · <a href={site.githubUrl}>GitHub</a></p>
+  </div>
+</div>
