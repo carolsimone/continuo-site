@@ -6,7 +6,7 @@ export const site = {
   githubUrl: 'https://github.com/carolsimone/continuo',
   linkedinUrl: 'https://www.linkedin.com/in/simonecarolini/',
   /** Substack publication URL, e.g. https://continuo.substack.com. Empty disables the form. Set in Task 13. */
-  substackUrl: '',
+  substackUrl: 'https://continuodata.substack.com',
   /** YouTube video ID of the two-minute walkthrough. Empty renders the placeholder. */
   youtubeId: '',
   /** Helm chart version shown in the quickstart. Bump with each chart release. */
