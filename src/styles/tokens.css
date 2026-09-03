@@ -1,0 +1,83 @@
+/*
+ * Design tokens and component classes for continuo-data.com.
+ * Source: continuo/.claude/design-guideline/ui.md at commit bf6db6c5 (2026-08-23).
+ * Colors, sizes, and class names are copied as written there. Do not add
+ * a color or a component here without adding it to ui.md first.
+ */
+:root {
+  color-scheme: light;
+  --ground: #f8f9fa;
+  --surface: #fff;
+  --ink: #1a1a1a;
+  --ink-strong: #111827;
+  --ink-body: #374151;
+  --ink-2: #6b7280;
+  --micro: #94a3b8;
+  --border: #e2e8f0;
+  --border-soft: #f1f5f9;
+  --border-btn: #d1d5db;
+  --primary: #4338ca;
+  --success: #16a34a;
+  --success-border: #86efac;
+  --code-bg: #f8fafc;
+  --code-ink: #334155;
+  --pill-bg: #f1f3f5;
+  --pill-ink: #555;
+  --info-bg: #eef2ff;    --info-border: #c7d2fe;    --info-ink: #4338ca;
+  --warn-bg: #fef3c7;    --warn-border: #fde68a;    --warn-ink: #92400e;
+  --err-bg: #fef2f2;     --err-border: #fca5a5;     --err-ink: #dc2626;
+  --neutral-bg: #f3f4f6; --neutral-border: #e5e7eb; --neutral-ink: #374151;
+  --sans: "Archivo", system-ui, -apple-system, sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "Geist Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --brand-gradient: linear-gradient(90deg, #7C3AED, #4F46E5, #0284C7, #0D9488);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Page shell */
+.page { min-height: 100vh; background: var(--ground); padding: 20px 24px; }
+.page-header { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.page-content--readable { max-width: 960px; margin: 0 auto; }
+.brand-rule { height: 2px; background: var(--brand-gradient); margin: -20px -24px 18px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 600; color: var(--ink-strong); text-decoration: none; }
+.brand__mark { width: 24px; height: 24px; flex-shrink: 0; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-weight: 500; font-size: 12px; line-height: 1.4; border-radius: 4px; border: 1px solid transparent; background: #fff; color: var(--ink-body); cursor: pointer; white-space: nowrap; text-decoration: none; font-family: inherit; transition: background .15s, border-color .15s, color .15s; }
+.btn--secondary { border-color: var(--border-btn); }
+.btn--primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.is-loading { opacity: .6; cursor: progress; }
+.btn.is-success { color: var(--success); border-color: var(--success-border); background: #fff; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Info strips */
+.info-strip { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 6px; font-size: 12px; border: 1px solid transparent; }
+.info-strip--info    { background: var(--info-bg);    border-color: var(--info-border);    color: var(--info-ink); }
+.info-strip--warning { background: var(--warn-bg);    border-color: var(--warn-border);    color: var(--warn-ink); }
+.info-strip--error   { background: var(--err-bg);     border-color: var(--err-border);     color: var(--err-ink); }
+.info-strip--neutral { background: var(--neutral-bg); border-color: var(--neutral-border); color: var(--neutral-ink); }
+.info-strip a { color: inherit; }
+
+/* Cards and section headers */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+.section-header { padding: 10px 16px; border-bottom: 1px solid var(--border-soft); }
+.section-header__main { display: flex; align-items: center; gap: 8px; }
+.section-header__title { font-size: 11px; font-weight: 700; color: var(--micro); text-transform: uppercase; letter-spacing: 0.7px; }
+.section-header__count { background: var(--pill-bg); color: var(--pill-ink); font-size: 11px; padding: 1px 7px; border-radius: 999px; font-weight: 500; }
+.section-header__sub { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+.micro { font-size: 11px; font-weight: 700; color: var(--micro); text-transform: uppercase; letter-spacing: 0.7px; }
+
+/* Log block */
+.log-block { margin: 0; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; overflow: auto; white-space: pre; font-family: var(--mono); font-size: 13px; line-height: 1.55; color: var(--code-ink); }
+
+/* Tabs */
+.tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; overflow-x: auto; }
+.tabs__tab { padding: 10px 0; font-size: 13px; color: var(--ink-2); border-bottom: 2px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+.tabs__tab--active { color: var(--ink-strong); border-bottom-color: var(--ink-strong); font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

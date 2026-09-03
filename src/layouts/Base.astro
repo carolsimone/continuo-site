@@ -1,0 +1,70 @@
+---
+import '@fontsource/archivo/400.css';
+import '@fontsource/archivo/500.css';
+import '@fontsource/archivo/600.css';
+import '@fontsource/source-serif-4/400.css';
+import '@fontsource/source-serif-4/500.css';
+import '@fontsource/source-serif-4/600.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '../styles/tokens.css';
+import '../styles/site.css';
+import Brand from '../components/Brand.astro';
+import Nav from '../components/Nav.astro';
+import { site } from '../../site.config';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description = site.description, ogImage = '/og.png' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = title === site.name ? site.name : `${title} · ${site.name}`;
+const beacon = `{"token": "${site.analyticsToken}"}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Continuo blog" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div class="page">
+      <div class="brand-rule"></div>
+      <header class="page-header">
+        <Brand />
+        <Nav />
+      </header>
+      <main class="page-content--readable">
+        <slot />
+      </main>
+      <footer class="footer page-content--readable">
+        <a href={site.githubUrl}>GitHub</a>
+        <a href="/docs/try-it-locally/">Docs</a>
+        <a href="/blog/">Blog</a>
+        <a href="/rss.xml">RSS</a>
+        <a href={site.linkedinUrl}>LinkedIn</a>
+        <span class="spacer"></span>
+        <span>Apache 2.0 · Built in Berlin by {site.author.name}</span>
+      </footer>
+    </div>
+    {import.meta.env.PROD && site.analyticsToken && (
+      <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={beacon}></script>
+    )}
+  </body>
+</html>
