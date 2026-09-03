@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+src/content/docs/*
+!src/content/docs/.gitkeep
+public/docs-assets/
+.DS_Store

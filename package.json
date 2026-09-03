@@ -1,0 +1,28 @@
+{
+  "name": "continuo-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "sync-docs": "node scripts/sync-docs.mjs",
+    "check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/archivo": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "@fontsource/source-serif-4": "^5.3.0",
+    "astro": "^7.2.10",
+    "reading-time": "^1.5.0",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.11"
+  }
+}
