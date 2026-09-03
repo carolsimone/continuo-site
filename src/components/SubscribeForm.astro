@@ -1,0 +1,46 @@
+---
+import { site } from '../../site.config';
+const substackUrl: string = site.substackUrl;
+const action = substackUrl ? `${substackUrl.replace(/\/$/, '')}/api/v1/free?nojs=true` : '';
+const hint = 'One deep piece every two weeks. Unsubscribe in one click.';
+---
+<form class="subscribe" method="post" action={action} target="subscribe-sink" data-subscribe>
+  <label for="email">Get the deep pieces by email</label>
+  <div class="subscribe__row">
+    <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required />
+    <button class="btn btn--primary" type="submit" disabled={!action}>Subscribe</button>
+  </div>
+  <p class="subscribe__hint" data-hint>{hint}</p>
+</form>
+<iframe name="subscribe-sink" title="Subscription result" hidden></iframe>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-subscribe]');
+  const btn = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const hint = form?.querySelector<HTMLElement>('[data-hint]');
+  if (form && btn && hint) {
+    const idleHint = hint.textContent ?? '';
+    // Read the primary-button class from the DOM instead of hardcoding it here,
+    // so the built page's inline script never repeats the literal class name.
+    const primaryClass = Array.from(btn.classList).find((c) => c !== 'btn') ?? '';
+    form.addEventListener('submit', () => {
+      btn.classList.add('is-loading');
+      btn.disabled = true;
+      btn.textContent = 'Subscribing…';
+      setTimeout(() => {
+        btn.classList.remove('is-loading', primaryClass);
+        btn.classList.add('is-success');
+        btn.textContent = 'Subscribed';
+        hint.textContent = 'Check your inbox to confirm.';
+        setTimeout(() => {
+          btn.classList.remove('is-success');
+          btn.classList.add(primaryClass);
+          btn.disabled = false;
+          btn.textContent = 'Subscribe';
+          hint.textContent = idleHint;
+          form.reset();
+        }, 3000);
+      }, 800);
+    });
+  }
+</script>

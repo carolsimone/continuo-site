@@ -1,0 +1,24 @@
+<div class="flow" aria-label="Release flow">
+  <div class="card flow__node">
+    <span class="k">1</span>
+    <h3>Publish an image</h3>
+    <p>Your CD builds the project image, as it does today.</p>
+  </div>
+  <div class="flow__link" aria-hidden="true"></div>
+  <div class="card flow__node">
+    <span class="k">2</span>
+    <h3>POST <code>/releases</code></h3>
+    <p>Continuo compiles the project and infers the graph. No DAG file.</p>
+  </div>
+  <div class="flow__link" aria-hidden="true"></div>
+  <div class="card flow__node flow__node--gate">
+    <span class="k">3</span>
+    <h3>Validate in a schema clone</h3>
+    <p>The full downstream lineage runs on a copy. Other teams' models included.</p>
+  </div>
+  <div class="flow__link" aria-hidden="true"></div>
+  <div class="card flow__out">
+    <div class="out out--pass"><strong>Pass.</strong><span>The release becomes production.</span></div>
+    <div class="out out--fail"><strong>Fail.</strong><span>Production stays on the last good version. An agent proposes the fix as a PR.</span></div>
+  </div>
+</div>

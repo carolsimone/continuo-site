@@ -1,0 +1,8 @@
+---
+interface Props {
+  variant?: 'info' | 'warning' | 'error' | 'neutral';
+  class?: string;
+}
+const { variant = 'info', class: cls } = Astro.props;
+---
+<div class:list={['info-strip', `info-strip--${variant}`, cls]}><slot /></div>

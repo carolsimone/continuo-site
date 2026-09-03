@@ -1,6 +1,83 @@
 ---
 import Base from '../layouts/Base.astro';
+import SubscribeForm from '../components/SubscribeForm.astro';
+import Quickstart from '../components/Quickstart.astro';
+import VideoSlot from '../components/VideoSlot.astro';
+import Flow from '../components/Flow.astro';
+import InfoStrip from '../components/InfoStrip.astro';
+import { site } from '../../site.config';
 ---
 <Base title="Continuo">
-  <h1>continuo</h1>
+  <div class="hero">
+    <div class="hero__copy">
+      <span class="micro">Open source · Apache 2.0</span>
+      <h1>{site.description}</h1>
+      <p class="lead">Independent projects, one inferred graph. Every release is proven in a schema clone before it becomes production. A rejected release gets a proposed fix for a human to review.</p>
+      <SubscribeForm />
+    </div>
+    <div class="card quick">
+      <div class="section-header">
+        <div class="section-header__main"><span class="section-header__title">Quickstart</span></div>
+        <div class="section-header__sub">An empty Continuo on a local kind cluster, in about ten minutes</div>
+      </div>
+      <Quickstart>
+        <a class="link" href="/docs/try-it-locally/">Then put real projects on it →</a>
+      </Quickstart>
+    </div>
+  </div>
+
+  <section class="bridge">
+    <p>Data pipelines ship without a release process. A model changes, the nightly run is the first test, and production finds the bug.</p>
+    <p class="bridge__turn">Continuo gives data a release process.</p>
+  </section>
+
+  <section class="section">
+    <div class="section-lead">
+      <span class="micro">How it works</span>
+      <h2>Every release goes through the same gate.</h2>
+    </div>
+    <Flow />
+  </section>
+
+  <section class="section">
+    <div class="section-lead">
+      <span class="micro">See it</span>
+      <h2>Two minutes, end to end.</h2>
+      <p>Install, POST a release, validation running, the graph, one rejection with its fix PR.</p>
+    </div>
+    <div class="card">
+      <VideoSlot id={site.youtubeId || undefined} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-lead">
+      <span class="micro">What you get</span>
+      <h2>Less to write. Less to break.</h2>
+    </div>
+    <ul class="delivers">
+      <li><strong>No hand-written DAGs.</strong> Dependencies come from your SQL and Python contracts.</li>
+      <li><strong>One graph across projects.</strong> dbt and Python stitched together, edges crossing both ways.</li>
+      <li><strong>Blue/green for data.</strong> Every release runs in a schema clone against its full lineage.</li>
+      <li><strong>Production never runs a broken graph.</strong> A rejected release leaves the last good version live.</li>
+      <li><strong>Breakage lands on the author,</strong> even when the damage is in another team's model.</li>
+      <li><strong>Agentic remediation.</strong> A fixable rejection gets a diff and, with a GitHub App, a pull request.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <div class="section-lead">
+      <span class="micro">Use it when</span>
+      <h2>Built for teams that share tables.</h2>
+    </div>
+    <div class="cards3">
+      <div class="card"><h3>Several teams, separate projects</h3><p>Projects read each other's tables. A change should be checked across that boundary before it ships.</p></div>
+      <div class="card"><h3>A fix before the deploy</h3><p>An agent proposes the fix before the change is deployed, not after the nightly run fails.</p></div>
+      <div class="card"><h3>Ask in plain language</h3><p>An LLM chat in the UI inspects the platform and, with your confirmation, acts on it.</p></div>
+    </div>
+  </section>
+
+  <InfoStrip variant="info" class="status">
+    <span>Beta. dbt, Python, and CSV nodes on one contract. Postgres and Trino today. Snowflake and BigQuery on the <a href="/docs/roadmap/">roadmap</a>.</span>
+  </InfoStrip>
 </Base>
