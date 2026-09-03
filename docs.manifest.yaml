@@ -1,0 +1,14 @@
+# Files mirrored from the continuo repo under /docs. Order here is tab order.
+# Source of truth stays in continuo. Add a line, rebuild.
+source_repo: carolsimone/continuo
+ref: main
+docs:
+  - path: docs/try-it-locally.md
+    slug: try-it-locally
+    title: Try it locally
+  - path: deploy/README.md
+    slug: deploy
+    title: Deploy
+  - path: docs/roadmap.md
+    slug: roadmap
+    title: Roadmap
