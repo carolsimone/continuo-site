@@ -1,0 +1,46 @@
+---
+import Base from './Base.astro';
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  doc: CollectionEntry<'docs'>;
+}
+
+const { doc } = Astro.props;
+const { Content } = await render(doc);
+const tabs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+const synced = new Date(doc.data.syncedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base title={doc.data.title} description={`${doc.data.title}. Mirrored from the Continuo repository.`}>
+  <nav class="tabs" aria-label="Docs">
+    {tabs.map((t) => (
+      <a class:list={['tabs__tab', { 'tabs__tab--active': t.id === doc.id }]} aria-current={t.id === doc.id ? 'page' : undefined} href={`/docs/${t.id}/`}>{t.data.tab}</a>
+    ))}
+  </nav>
+  <article class="doc">
+    <div class="source">
+      <span>Source</span>
+      <code>continuo/{doc.data.sourcePath}</code>
+      <span>·</span>
+      <code>{doc.data.sourceSha}</code>
+      <span>·</span>
+      <span>synced {synced}</span>
+      <span>·</span>
+      <a href={doc.data.editUrl}>Edit on GitHub ↗</a>
+    </div>
+    <h1>{doc.data.title}</h1>
+    <Content />
+  </article>
+</Base>
+
+<script>
+  for (const h of document.querySelectorAll<HTMLElement>('.doc h2[id], .doc h3[id]')) {
+    const a = document.createElement('a');
+    a.className = 'anchor';
+    a.href = `#${h.id}`;
+    a.textContent = '#';
+    a.setAttribute('aria-label', 'Link to this section');
+    h.append(a);
+  }
+</script>
