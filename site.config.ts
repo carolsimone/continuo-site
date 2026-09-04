@@ -2,7 +2,7 @@ export const site = {
   name: 'Continuo',
   url: 'https://continuo-data.com',
   description:
-    'A control plane for dbt and Python projects with blue/green validation and agentic remediation.',
+    'A control plane that runs your dbt and Python pipelines — with blue/green validation, agentic remediation, and an LLM chat.',
   githubUrl: 'https://github.com/carolsimone/continuo',
   linkedinUrl: 'https://www.linkedin.com/in/simonecarolini/',
   /** Substack publication URL, e.g. https://continuo.substack.com. Empty disables the form. Set in Task 13. */
