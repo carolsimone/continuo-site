@@ -1,10 +1,16 @@
 ---
 import { site } from '../../site.config';
-// Substack blocks the no-JS POST endpoint (403), so the subscribe UI uses
-// Substack's own embed widget served from the publication URL.
+// Substack blocks the no-JS POST endpoint (403), so the on-brand form hands
+// off to Substack's own subscribe page with the email prefilled.
+const substackUrl: string = site.substackUrl;
+const action = substackUrl ? `${substackUrl.replace(/\/$/, '')}/subscribe` : '';
+const hint = 'One deep piece every two weeks. Unsubscribe in one click.';
 ---
-<div class="subscribe">
-  <span class="micro">Get the deep pieces by email</span>
-  <iframe src={`${site.substackUrl}/embed`} title="Subscribe" width="100%" height="150" loading="lazy"></iframe>
-  <p class="subscribe__hint">One deep piece every two weeks. Unsubscribe in one click.</p>
-</div>
+<form class="subscribe" method="get" action={action} target="_blank">
+  <label for="email">Get the deep pieces by email</label>
+  <div class="subscribe__row">
+    <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required />
+    <button class="btn btn--primary" type="submit" disabled={!action}>Subscribe</button>
+  </div>
+  <p class="subscribe__hint">{hint}</p>
+</form>
