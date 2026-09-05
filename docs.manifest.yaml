@@ -3,9 +3,12 @@
 source_repo: carolsimone/continuo
 ref: main
 docs:
-  - path: docs/try-it-locally.md
-    slug: try-it-locally
-    title: Try it locally
+  - path: docs/instantiate-continuo.md
+    slug: instantiate-continuo
+    title: Instantiate the platform
+  - path: docs/run-projects-in-continuo.md
+    slug: run-projects-in-continuo
+    title: Run projects
   - path: deploy/README.md
     slug: deploy
     title: Deploy to K8s
