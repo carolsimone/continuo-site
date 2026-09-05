@@ -8,7 +8,7 @@ docs:
     title: Try it locally
   - path: deploy/README.md
     slug: deploy
-    title: Deploy
+    title: Deploy to K8s
   - path: docs/roadmap.md
     slug: roadmap
     title: Roadmap
