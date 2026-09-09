@@ -26,6 +26,7 @@ const article = { title: post.data.title, description: post.data.description, pa
   ogType="article"
   publishedTime={post.data.date}
   jsonLd={[blogPostingSchema(article), personSchema()]}
+  markdownUrl={`/blog/${post.id}.md`}
 >
   <article class="article">
     <div class="meta">{date} · {minutes} min read</div>

@@ -23,6 +23,7 @@ const article = { title: doc.data.title, description, path, published: modified 
   ogType="article"
   modifiedTime={modified}
   jsonLd={[techArticleSchema(article), personSchema()]}
+  markdownUrl={`/docs/${doc.id}.md`}
 >
   <nav class="tabs" aria-label="Docs">
     {tabs.map((t) => (
