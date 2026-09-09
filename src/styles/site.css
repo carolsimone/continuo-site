@@ -29,11 +29,7 @@
 .quick__actions .link { font-size: 13px; color: var(--primary); text-decoration: none; margin-left: auto; }
 .quick__actions .link:hover { text-decoration: underline; }
 
-/* Landing: bridge and sections */
-.bridge { margin: 44px auto 0; max-width: 60ch; display: flex; flex-direction: column; gap: 10px; padding-left: 16px; border-left: 2px solid var(--border); }
-.bridge p { margin: 0; font-family: var(--serif); font-size: 20px; line-height: 1.5; color: var(--ink-body); }
-.bridge .bridge__turn { font-family: var(--sans); font-weight: 600; color: var(--ink-strong); font-size: 19px; }
-
+/* Landing: sections */
 .section { margin-top: 48px; display: flex; flex-direction: column; gap: 14px; }
 .section-lead { display: flex; flex-direction: column; gap: 6px; max-width: 60ch; }
 .section-lead h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink-strong); text-wrap: balance; }
