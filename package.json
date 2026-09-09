@@ -8,6 +8,7 @@
     "check": "astro check",
     "build": "npm run sync-docs && astro build",
     "preview": "astro preview",
+    "indexnow": "node scripts/indexnow.mjs",
     "test": "vitest run"
   },
   "dependencies": {
