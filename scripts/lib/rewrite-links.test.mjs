@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rewriteLinks, extractTitle, buildDocFrontmatter } from './rewrite-links.mjs';
+import { rewriteLinks, extractTitle, buildDocFrontmatter, extractDescription } from './rewrite-links.mjs';
 
 const ctx = {
   sourcePath: 'docs/try-it-locally.md',
@@ -85,8 +85,10 @@ describe('buildDocFrontmatter', () => {
       title: 'Try it locally, with real data projects',
       tab: 'Try it locally',
       order: 1,
+      description: 'An empty Continuo on a local kind cluster, in about ten minutes.',
       sourcePath: 'docs/try-it-locally.md',
       sourceSha: 'a1b2c3d',
+      sourceDate: '2026-09-01T09:30:00Z',
       syncedAt: '2026-09-03T10:00:00.000Z',
       editUrl: 'https://github.com/carolsimone/continuo/edit/main/docs/try-it-locally.md',
     });
@@ -95,12 +97,35 @@ describe('buildDocFrontmatter', () => {
       'title: "Try it locally, with real data projects"',
       'tab: "Try it locally"',
       'order: 1',
+      'description: "An empty Continuo on a local kind cluster, in about ten minutes."',
       'sourcePath: "docs/try-it-locally.md"',
       'sourceSha: "a1b2c3d"',
+      'sourceDate: "2026-09-01T09:30:00Z"',
       'syncedAt: "2026-09-03T10:00:00.000Z"',
       'editUrl: "https://github.com/carolsimone/continuo/edit/main/docs/try-it-locally.md"',
       '---',
       '',
     ].join('\n'));
+  });
+});
+
+describe('extractDescription', () => {
+  it('takes the first paragraph and strips links, emphasis, and line breaks', () => {
+    const md = 'Intro line one\nwith a [link](/docs/x/) and **bold** `code`.\n\nSecond paragraph.';
+    expect(extractDescription(md)).toBe('Intro line one with a link and bold code.');
+  });
+
+  it('skips headings, blockquotes, lists, tables, images, and code fences', () => {
+    const md = '## Heading\n\n> quote\n\n- item\n\n1. step\n\n| a | b |\n\n![img](/x.png)\n\n```sh\nx\n```\n\nReal text.';
+    expect(extractDescription(md)).toBe('Real text.');
+  });
+
+  it('cuts at a word boundary under the limit and appends an ellipsis', () => {
+    const md = 'word '.repeat(50).trim();
+    expect(extractDescription(md, 40)).toBe('word word word word word word word…');
+  });
+
+  it('returns an empty string when there is no paragraph', () => {
+    expect(extractDescription('# only\n\n## heading')).toBe('');
   });
 });

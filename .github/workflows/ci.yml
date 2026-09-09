@@ -37,3 +37,7 @@ jobs:
         with:
           args: --offline --root-dir ./dist --include-fragments './dist/**/*.html'
           fail: true
+
+      - name: Ping IndexNow
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm run indexnow

@@ -49,6 +49,27 @@ export function extractTitle(markdown, fallback = '') {
   return { title: m[1].trim(), body: markdown.slice(m[0].length) };
 }
 
+const SKIP_PARAGRAPH_RE = /^(#|>|```|~~~|[-*] |\d+\. |\||!\[|<)/;
+
+/** First prose paragraph as plain text for a meta description, capped at `max` characters. */
+export function extractDescription(markdown, max = 160) {
+  const para = markdown
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .find((p) => p && !SKIP_PARAGRAPH_RE.test(p));
+  if (!para) return '';
+  const text = para
+    .replace(/\n/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[`*_]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+}
+
 const q = (v) => JSON.stringify(String(v));
 
 /** YAML frontmatter for a generated doc. Strings are JSON-quoted, which YAML accepts. */
@@ -58,8 +79,10 @@ export function buildDocFrontmatter(f) {
     `title: ${q(f.title)}`,
     `tab: ${q(f.tab)}`,
     `order: ${f.order}`,
+    `description: ${q(f.description)}`,
     `sourcePath: ${q(f.sourcePath)}`,
     `sourceSha: ${q(f.sourceSha)}`,
+    `sourceDate: ${q(f.sourceDate)}`,
     `syncedAt: ${q(f.syncedAt)}`,
     `editUrl: ${q(f.editUrl)}`,
     '---',

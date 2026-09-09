@@ -6,8 +6,9 @@ import VideoSlot from '../components/VideoSlot.astro';
 import Flow from '../components/Flow.astro';
 import InfoStrip from '../components/InfoStrip.astro';
 import { site } from '../../site.config';
+import { websiteSchema, softwareSchema, personSchema } from '../lib/schema';
 ---
-<Base title="Continuo">
+<Base title="Continuo" jsonLd={[websiteSchema(), softwareSchema(), personSchema()]}>
   <div class="hero">
     <div class="hero__copy">
       <span class="micro">Open source · Apache 2.0</span>

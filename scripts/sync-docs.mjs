@@ -5,7 +5,7 @@ import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { rewriteLinks, extractTitle, buildDocFrontmatter } from './lib/rewrite-links.mjs';
+import { rewriteLinks, extractTitle, buildDocFrontmatter, extractDescription } from './lib/rewrite-links.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = path.join(ROOT, 'src/content/docs');
@@ -19,16 +19,19 @@ async function fetchOk(url, init) {
   return res;
 }
 
-async function latestSha(repo, ref, filePath) {
+/** Short SHA and committer date of the last commit that touched `filePath`. Falls back to the ref and now. */
+async function latestCommit(repo, ref, filePath) {
   const url = `https://api.github.com/repos/${repo}/commits?path=${encodeURIComponent(filePath)}&sha=${ref}&per_page=1`;
   const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'continuo-site-sync' };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  const fallback = { sha: ref, date: new Date().toISOString() };
   try {
     const [first] = await (await fetchOk(url, { headers })).json();
-    return first?.sha ? first.sha.slice(0, 7) : ref;
+    if (!first?.sha) return fallback;
+    return { sha: first.sha.slice(0, 7), date: first.commit.committer.date };
   } catch (err) {
-    log(`sha lookup failed for ${filePath} (${err.message}); using "${ref}"`);
-    return ref;
+    log(`commit lookup failed for ${filePath} (${err.message}); using "${ref}" and now`);
+    return fallback;
   }
 }
 
@@ -45,7 +48,7 @@ async function main() {
 
   for (const [i, doc] of docs.entries()) {
     const source = await (await fetchOk(raw(doc.path))).text();
-    const sha = await latestSha(repo, ref, doc.path);
+    const { sha, date } = await latestCommit(repo, ref, doc.path);
     const { title, body } = extractTitle(source, doc.title);
     const { markdown, images } = rewriteLinks(body, { sourcePath: doc.path, slug: doc.slug, repo, ref, routes });
 
@@ -60,8 +63,10 @@ async function main() {
       title,
       tab: doc.title,
       order: i + 1,
+      description: extractDescription(markdown),
       sourcePath: doc.path,
       sourceSha: sha,
+      sourceDate: date,
       syncedAt: new Date().toISOString(),
       editUrl: `https://github.com/${repo}/edit/${ref}/${doc.path}`,
     });
