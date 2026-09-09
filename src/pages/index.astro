@@ -13,7 +13,7 @@ import { websiteSchema, softwareSchema, personSchema } from '../lib/schema';
     <div class="hero__copy">
       <span class="micro">Open source · Apache 2.0</span>
       <h1>{site.description}</h1>
-      <p class="lead">Independent projects, one inferred graph. Every release is proven in a schema clone before it becomes production. A rejected release gets a proposed fix for a human to review. An LLM chat inspects and acts on the platform in plain language.</p>
+      <p class="lead">Independent dbt and Python projects, stitched into one graph — the platform infers it, so you never wire it up. Every release is proven in a schema clone before it becomes production. When one is rejected, a remediation agent opens a pull request with the fix for a human to review. An LLM chat inspects and acts on your pipelines and schedules in plain language.</p>
       <SubscribeForm />
     </div>
     <div class="card quick">
@@ -26,11 +26,6 @@ import { websiteSchema, softwareSchema, personSchema } from '../lib/schema';
       </Quickstart>
     </div>
   </div>
-
-  <section class="bridge">
-    <p>Data pipelines ship without a release process. A model changes, the nightly run is the first test, and production finds the bug.</p>
-    <p class="bridge__turn">Continuo gives data a release process.</p>
-  </section>
 
   <section class="section">
     <div class="section-lead">
@@ -54,7 +49,7 @@ import { websiteSchema, softwareSchema, personSchema } from '../lib/schema';
   <section class="section">
     <div class="section-lead">
       <span class="micro">What you get</span>
-      <h2>Less to write. Less to break.</h2>
+      <h2>What a release process gives your data.</h2>
     </div>
     <ul class="delivers">
       <li><strong>No hand-written DAGs.</strong> Dependencies come from your SQL and Python contracts.</li>
@@ -69,12 +64,12 @@ import { websiteSchema, softwareSchema, personSchema } from '../lib/schema';
   <section class="section">
     <div class="section-lead">
       <span class="micro">Use it when</span>
-      <h2>Built for teams that share tables.</h2>
+      <h2>Built for a data mesh.</h2>
     </div>
     <div class="cards3">
       <div class="card"><h3>Several teams, separate projects</h3><p>Projects read each other's tables. A change should be checked across that boundary before it ships.</p></div>
       <div class="card"><h3>A fix before the deploy</h3><p>An agent proposes the fix before the change is deployed, not after the nightly run fails.</p></div>
-      <div class="card"><h3>Ask in plain language</h3><p>An LLM chat in the UI inspects the platform and, with your confirmation, acts on it.</p></div>
+      <div class="card"><h3>Ask in plain language</h3><p>An LLM chat in the UI inspects your pipelines and schedules and, with your confirmation, acts on them.</p></div>
     </div>
   </section>
 
