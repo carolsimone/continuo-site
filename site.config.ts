@@ -20,5 +20,6 @@ export const site = {
   author: {
     name: 'Simone Carolini',
     bio: 'Builds Continuo. Data platform engineer in Berlin.',
+    githubUrl: 'https://github.com/carolsimone',
   },
 } as const;
