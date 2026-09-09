@@ -7,6 +7,7 @@ import { render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import readingTime from 'reading-time';
 import { site } from '../../site.config';
+import { blogPostingSchema, personSchema } from '../lib/schema';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -16,8 +17,16 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const minutes = Math.max(1, Math.round(readingTime(post.body ?? '').minutes));
 const date = post.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const path = `/blog/${post.id}/`;
+const article = { title: post.data.title, description: post.data.description, path, published: post.data.date };
 ---
-<Base title={post.data.title} description={post.data.description}>
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  publishedTime={post.data.date}
+  jsonLd={[blogPostingSchema(article), personSchema()]}
+>
   <article class="article">
     <div class="meta">{date} · {minutes} min read</div>
     <h1>{post.data.title}</h1>
