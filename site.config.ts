@@ -1,5 +1,7 @@
 export const site = {
   name: 'Continuo',
+  /** <title> of the landing page. The H1 carries the description; the title carries the query. */
+  homeTitle: 'Continuo: open-source control plane for dbt and Python pipelines',
   url: 'https://continuo-data.com',
   description:
     'A control plane that runs your dbt and Python pipelines — with blue/green validation, agentic remediation, and an LLM chat.',
