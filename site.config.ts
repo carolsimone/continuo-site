@@ -13,6 +13,8 @@ export const site = {
   chartVersion: '0.4.0',
   /** Cloudflare Web Analytics token. Public by design. Set in Task 11. */
   analyticsToken: '',
+  /** Open Graph card. 1280x640 JPEG, under 150 KB. */
+  ogImage: { path: '/og.jpg', width: 1280, height: 640, type: 'image/jpeg' },
   author: {
     name: 'Simone Carolini',
     bio: 'Builds Continuo. Data platform engineer in Berlin.',
