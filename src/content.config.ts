@@ -8,8 +8,12 @@ const docs = defineCollection({
     title: z.string(),
     tab: z.string(),
     order: z.number(),
+    /** First paragraph of the source, plain text, at most 160 characters. May be empty. */
+    description: z.string(),
     sourcePath: z.string(),
     sourceSha: z.string(),
+    /** ISO date of the last commit that touched the source file. */
+    sourceDate: z.string(),
     syncedAt: z.string(),
     editUrl: z.string().url(),
   }),

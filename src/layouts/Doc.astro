@@ -2,6 +2,7 @@
 import Base from './Base.astro';
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
+import { techArticleSchema, personSchema } from '../lib/schema';
 
 interface Props {
   doc: CollectionEntry<'docs'>;
@@ -11,8 +12,18 @@ const { doc } = Astro.props;
 const { Content } = await render(doc);
 const tabs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
 const synced = new Date(doc.data.syncedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const description = doc.data.description || `${doc.data.title}. From the Continuo documentation.`;
+const modified = new Date(doc.data.sourceDate);
+const path = `/docs/${doc.id}/`;
+const article = { title: doc.data.title, description, path, published: modified };
 ---
-<Base title={doc.data.title} description={`${doc.data.title}. Mirrored from the Continuo repository.`}>
+<Base
+  title={doc.data.title}
+  description={description}
+  ogType="article"
+  modifiedTime={modified}
+  jsonLd={[techArticleSchema(article), personSchema()]}
+>
   <nav class="tabs" aria-label="Docs">
     {tabs.map((t) => (
       <a class:list={['tabs__tab', { 'tabs__tab--active': t.id === doc.id }]} aria-current={t.id === doc.id ? 'page' : undefined} href={`/docs/${t.id}/`}>{t.data.tab}</a>
