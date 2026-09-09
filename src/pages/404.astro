@@ -1,0 +1,26 @@
+---
+// src/pages/404.astro
+// Cloudflare Pages serves dist/404.html with status 404 for every unmatched route.
+// Without this file Pages falls back to SPA mode and serves index.html with 200.
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found" description="That page does not exist on continuo-data.com." noindex>
+  <div class="page-title">
+    <h1>Page not found</h1>
+    <p>The address may have moved. These are the places to start.</p>
+  </div>
+  <div class="card rows">
+    <a class="row" href="/">
+      <div class="row__meta"><span>Home</span></div>
+      <div><p class="row__title">What Continuo is</p><p class="row__sum">Overview and the ten-minute quickstart.</p></div>
+    </a>
+    <a class="row" href="/docs/instantiate-continuo/">
+      <div class="row__meta"><span>Docs</span></div>
+      <div><p class="row__title">Instantiate the platform</p><p class="row__sum">Run an empty Continuo on a local kind cluster.</p></div>
+    </a>
+    <a class="row" href="/blog/">
+      <div class="row__meta"><span>Blog</span></div>
+      <div><p class="row__title">Blog</p><p class="row__sum">The argument for a release process for data, one chapter at a time.</p></div>
+    </a>
+  </div>
+</Base>

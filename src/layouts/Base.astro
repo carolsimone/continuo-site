@@ -17,9 +17,11 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  /** Error and utility pages: tell crawlers not to index, and skip the canonical. */
+  noindex?: boolean;
 }
 
-const { title, description = site.description, ogImage = '/og.png' } = Astro.props;
+const { title, description = site.description, ogImage = '/og.png', noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title === site.name ? site.name : `${title} · ${site.name}`;
 const beacon = `{"token": "${site.analyticsToken}"}`;
@@ -31,7 +33,7 @@ const beacon = `{"token": "${site.analyticsToken}"}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title="Continuo blog" href="/rss.xml" />
