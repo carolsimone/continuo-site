@@ -7,7 +7,4 @@ export default defineConfig({
   markdown: {
     shikiConfig: { theme: 'github-light' },
   },
-  redirects: {
-    '/docs': '/docs/try-it-locally/',
-  },
 });
