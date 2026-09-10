@@ -4,7 +4,7 @@ import { site } from '../../site.config';
 // off to Substack's own subscribe page with the email prefilled.
 const substackUrl: string = site.substackUrl;
 const action = substackUrl ? `${substackUrl.replace(/\/$/, '')}/subscribe` : '';
-const hint = 'Deep pieces and release guides. Free, unsubscribe any time.';
+const hint = 'Deep pieces and release guides.';
 ---
 <form class="subscribe" method="get" action={action} target="_blank">
   <label for="email">Keep up with Continuo</label>

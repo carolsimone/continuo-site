@@ -6,9 +6,11 @@ export const site = {
   description:
     'A control plane that runs your dbt and Python pipelines — with blue/green validation, agentic remediation, and an LLM chat.',
   githubUrl: 'https://github.com/carolsimone/continuo',
-  linkedinUrl: 'https://www.linkedin.com/in/simonecarolini/',
+  linkedinUrl: 'https://www.linkedin.com/in/simone-carolini/',
   /** Substack publication URL, e.g. https://continuo.substack.com. Empty disables the form. Set in Task 13. */
   substackUrl: 'https://continuodata.substack.com',
+  /** Show the Blog + RSS links in the nav and footer. Flip to true when the Airflow post ships. */
+  showBlog: false,
   /** YouTube video ID of the two-minute walkthrough. Empty renders the placeholder. */
   youtubeId: '',
   /** Helm chart version shown in the quickstart. Bump with each chart release. */

@@ -3,6 +3,6 @@ import { site } from '../../site.config';
 ---
 <nav class="nav" aria-label="Main">
   <a href="/docs/instantiate-continuo/">Docs</a>
-  <a href="/blog/">Blog</a>
+  {site.showBlog && <a href="/blog/">Blog</a>}
   <a href={site.githubUrl}>GitHub ↗</a>
 </nav>

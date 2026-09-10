@@ -88,11 +88,11 @@ const graph = jsonLd.length > 0 ? JSON.stringify({ '@context': 'https://schema.o
       <footer class="footer page-content--readable">
         <a href={site.githubUrl}>GitHub</a>
         <a href="/docs/instantiate-continuo/">Docs</a>
-        <a href="/blog/">Blog</a>
-        <a href="/rss.xml">RSS</a>
+        {site.showBlog && <a href="/blog/">Blog</a>}
+        {site.showBlog && <a href="/rss.xml">RSS</a>}
         <a href={site.linkedinUrl}>LinkedIn</a>
         <span class="spacer"></span>
-        <span>Apache 2.0 · Built in Berlin by {site.author.name}</span>
+        <span>Apache 2.0 · Built in Berlin 🇪🇺</span>
       </footer>
     </div>
     {import.meta.env.PROD && site.analyticsToken && (

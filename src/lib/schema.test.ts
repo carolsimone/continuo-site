@@ -14,7 +14,7 @@ describe('personSchema', () => {
     expect(p['@type']).toBe('Person');
     expect(p['@id']).toBe('https://continuo-data.com/#author');
     expect(p.name).toBe('Simone Carolini');
-    expect(p.sameAs).toEqual(['https://github.com/carolsimone', 'https://www.linkedin.com/in/simonecarolini/']);
+    expect(p.sameAs).toEqual(['https://github.com/carolsimone', 'https://www.linkedin.com/in/simone-carolini/']);
   });
 });
 
