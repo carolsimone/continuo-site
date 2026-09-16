@@ -12,7 +12,7 @@ export const site = {
   /** Show the Blog + RSS links in the nav and footer. Flip to true when the Airflow post ships. */
   showBlog: false,
   /** YouTube video ID of the two-minute walkthrough. Empty renders the placeholder. */
-  youtubeId: '',
+  youtubeId: 'OlYvNGzs5L8',
   /** Helm chart version shown in the quickstart. Bump with each chart release. */
   chartVersion: '0.6.0',
   /** Cloudflare Web Analytics token. Public by design. Set in Task 11. */
