@@ -121,6 +121,7 @@
 .doc code { font-family: var(--mono); font-size: 14px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
 .doc pre { margin: 0; background: var(--code-bg) !important; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; overflow: auto; font-family: var(--mono); font-size: 13px; line-height: 1.55; }
 .doc pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.doc img { display: block; max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; }
 .doc table { display: block; overflow-x: auto; border-collapse: collapse; font-family: var(--sans); font-size: 13px; }
 .doc th, .doc td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
 .doc th { font-size: 10.5px; text-transform: uppercase; color: var(--ink-2); background: var(--code-bg); }
