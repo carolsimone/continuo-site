@@ -14,7 +14,7 @@ export const site = {
   /** YouTube video ID of the two-minute walkthrough. Empty renders the placeholder. */
   youtubeId: 'OlYvNGzs5L8',
   /** Helm chart version shown in the quickstart. Bump with each chart release. */
-  chartVersion: '0.6.0',
+  chartVersion: '0.6.1',
   /** Cloudflare Web Analytics token. Public by design. Set in Task 11. */
   analyticsToken: '',
   /** Open Graph card. 1280x640 JPEG, under 150 KB. */
