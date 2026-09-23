@@ -85,7 +85,9 @@ Each ends **promoted** — and there's the first win: there is no `03:00` for fi
 | continuo-core | validated across the graph, then promoted | ✅ promoted |
 | continuo-finance | reads core's `revenue_per_user`; sequenced after it | ✅ promoted |
 
-Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.)
+Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.) One run, both services, in one graph — core's nodes and finance's in their own lanes, with the cross-service edges Continuo sequenced on:
+
+![Continuo's run view — the daily schedule at 13/13 nodes succeeded, core 5/5 and finance 8/8 in separate swim lanes, dependency edges crossing between them](/blog/airflow-to-continuo/continuo-run-swimlanes.png)
 
 ## Step 3 — The same break, rejected before it ships
 
@@ -102,9 +104,19 @@ This time it is **rejected**. Continuo validates core against the whole topology
 | continuo-core | rename validated across the graph → finance would break | ❌ rejected |
 | production | `current-prod` unchanged — the bad release never shipped | ✅ safe |
 
-![Continuo rejecting the release — the graph with the failing downstream node, status validation_failed](/blog/airflow-to-continuo/continuo-rejected.png)
+![Continuo's Releases tab — core v2 rejected on validation while production stays on the last good finance release](/blog/airflow-to-continuo/continuo-rejected.png)
 
 Airflow found the break at 03:00, in production, in finance's data. Continuo found it at release, in a shadow, before anything shipped.
+
+## Step 4 — Continuo proposes the fix
+
+A rejected release tells you something broke. Continuo can also try to fix it. When the release is rejected, its remediation agent classifies the failure, reads the *changed* model's source at `repo@commit_sha`, and asks an LLM for a repair — then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
+
+For this break, it edited core's `revenue_per_user` and kept both column names — the new `net_revenue_eur` *and* `revenue_eur` back as an alias — so finance's `ltv_per_user` reads again without finance changing a line. Verified by a live dbt run, confidence **high**, one click from a PR:
+
+![Continuo's remediation proposal — status proposed, confidence high, verification passed; the agent adds revenue_eur back as an alias in core's revenue_per_user so finance reads again, with a Create PR button](/blog/airflow-to-continuo/continuo-remediation-proposal.png)
+
+The fix lands in the service that changed — core — because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs two credentials the rest of the demo doesn't (an LLM key to write the fix, a read-only GitHub token to read the source); the **[platform guide](/docs/run-projects-in-continuo)** walks through both, plus the GitHub App that turns *Create PR* into a real pull request.
 
 ## Why it's better: dependencies, and deployment
 
