@@ -85,7 +85,9 @@ Each ends **promoted** — and there's the first win: there is no `03:00` for fi
 | continuo-core | validated across the graph, then promoted | ✅ promoted |
 | continuo-finance | reads core's `revenue_per_user`; sequenced after it | ✅ promoted |
 
-Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.)
+Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.) One run, both services, in one graph — core's nodes and finance's in their own lanes, with the cross-service edges Continuo sequenced on:
+
+![Continuo's run view — the daily schedule at 13/13 nodes succeeded, core 5/5 and finance 8/8 in separate swim lanes, dependency edges crossing between them](/blog/airflow-to-continuo/continuo-run-swimlanes.png)
 
 ## Step 3 — The same break, rejected before it ships
 
@@ -102,7 +104,7 @@ This time it is **rejected**. Continuo validates core against the whole topology
 | continuo-core | rename validated across the graph → finance would break | ❌ rejected |
 | production | `current-prod` unchanged — the bad release never shipped | ✅ safe |
 
-![Continuo rejecting the release — the graph with the failing downstream node, status validation_failed](/blog/airflow-to-continuo/continuo-rejected.png)
+![Continuo's Releases tab — core v2 rejected on validation while production stays on the last good finance release](/blog/airflow-to-continuo/continuo-rejected.png)
 
 Airflow found the break at 03:00, in production, in finance's data. Continuo found it at release, in a shadow, before anything shipped.
 
