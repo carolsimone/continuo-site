@@ -108,6 +108,16 @@ This time it is **rejected**. Continuo validates core against the whole topology
 
 Airflow found the break at 03:00, in production, in finance's data. Continuo found it at release, in a shadow, before anything shipped.
 
+## Step 4 — Continuo proposes the fix
+
+A rejected release tells you something broke. Continuo can also try to fix it. When the release is rejected, its remediation agent classifies the failure, reads the *changed* model's source at `repo@commit_sha`, and asks an LLM for a repair — then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
+
+For this break, it edited core's `revenue_per_user` and kept both column names — the new `net_revenue_eur` *and* `revenue_eur` back as an alias — so finance's `ltv_per_user` reads again without finance changing a line. Verified by a live dbt run, confidence **high**, one click from a PR:
+
+![Continuo's remediation proposal — status proposed, confidence high, verification passed; the agent adds revenue_eur back as an alias in core's revenue_per_user so finance reads again, with a Create PR button](/blog/airflow-to-continuo/continuo-remediation-proposal.png)
+
+The fix lands in the service that changed — core — because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs two credentials the rest of the demo doesn't (an LLM key to write the fix, a read-only GitHub token to read the source); the **[platform guide](/docs/run-projects-in-continuo)** walks through both, plus the GitHub App that turns *Create PR* into a real pull request.
+
 ## Why it's better: dependencies, and deployment
 
 Two things Continuo gives that two Airflows can't:
