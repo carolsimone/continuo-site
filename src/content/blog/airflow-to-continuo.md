@@ -35,6 +35,15 @@ git clone https://github.com/carolsimone/airflow-finance-demo
 cd airflow-finance-demo && make up
 ```
 
+Give each scheduler a minute to parse its DAG, then open both Airflow UIs:
+
+| Team | Airflow UI | Username / password |
+|---|---|---|
+| core | [localhost:8080](http://localhost:8080) | `admin` / `admin` |
+| finance | [127.0.0.1:8081](http://127.0.0.1:8081) | `admin` / `admin` |
+
+Why `127.0.0.1` for finance: browsers share cookies across ports, so two Airflows on `localhost` keep logging each other out. A different host name gives each UI its own session.
+
 ## The break: core changes one column, finance breaks, nobody knows
 
 core renames a column: `revenue_eur` becomes `net_revenue_eur`. A reasonable change: the number is net of fees now, and the name should say so. core updates its model, its tests, its docs. core's pipeline runs green. Every check core owns passes.
