@@ -10,7 +10,7 @@ export const site = {
   /** Substack publication URL, e.g. https://continuo.substack.com. Empty disables the form. Set in Task 13. */
   substackUrl: 'https://continuodata.substack.com',
   /** Show the Blog + RSS links in the nav and footer. Flip to true when the Airflow post ships. */
-  showBlog: false,
+  showBlog: true,
   /** YouTube video ID of the two-minute walkthrough. Empty renders the placeholder. */
   youtubeId: 'OlYvNGzs5L8',
   /** Helm chart version shown in the quickstart. Bump with each chart release. */
