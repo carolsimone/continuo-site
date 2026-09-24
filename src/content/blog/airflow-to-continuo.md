@@ -2,7 +2,7 @@
 title: "Migrating two dbt projects from Airflow to Continuo"
 description: "Two dbt teams on separate Airflows, one silent cross-team break, and the step-by-step move to Continuo, where that break becomes a rejected release instead of a Monday-morning incident."
 date: 2026-09-05
-draft: true
+draft: false
 ---
 Data pipelines get deployed without a release process. A dbt change ships the minute it merges, and nothing checks that it won't break the team reading your tables downstream. Software solved this with staging and validation gates. Data mostly didn't. 🚢
 
