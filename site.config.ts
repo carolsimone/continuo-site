@@ -21,7 +21,7 @@ export const site = {
   ogImage: { path: '/og.jpg', width: 1280, height: 640, type: 'image/jpeg' },
   author: {
     name: 'Simone Carolini',
-    bio: 'Builds Continuo. Data platform engineer in Berlin.',
+    bio: 'Building Continuo. Software (data), Berlin.',
     githubUrl: 'https://github.com/carolsimone',
   },
 } as const;

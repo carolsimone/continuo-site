@@ -127,12 +127,13 @@ For this break, it edited core's `revenue_per_user` and kept both column names: 
 
 The fix lands in the service that changed, core, because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs two credentials the rest of the demo doesn't (an LLM key to write the fix, a read-only GitHub token to read the source); the **[platform guide](/docs/run-projects-in-continuo)** walks through both, plus the GitHub App that turns *Create PR* into a real pull request.
 
-## Why it's better: dependencies, and deployment
+## Why it's better: dependencies, deployment, and integration
 
-Two things Continuo gives that two Airflows can't:
+Three things Continuo gives that two Airflows can't:
 
 - **Cross-service dependencies.** core and finance depend on each other across projects (core reads a finance table; finance reads a core table). On Airflow that mesh had no run order two cron schedules could express, so you scheduled an hour apart and hoped. Continuo orders it from the dependency graph itself, every release.
 - **Deployment.** A change is validated against the *whole* topology before it promotes, blue/green. The rename wasn't wrong: teams rename columns every week. What was missing was the gate every software deploy has and most data pipelines don't: something that looks at the whole graph and says "not yet" before a change lands. 🔒
+- **Integration.** Plugging a project in takes one endpoint. Your CI pushes the image to the registry you already use, then POSTs the service name and image tag to the platform's `/releases` endpoint. That's the whole contract: no DAG to write, no scheduler to run or upgrade, no change to the dbt code.
 
 ## Run it yourself
 
