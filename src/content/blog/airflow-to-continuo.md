@@ -4,7 +4,7 @@ description: "Two dbt teams on separate Airflows, one silent cross-team break, a
 date: 2026-09-05
 draft: false
 ---
-Data pipelines get deployed without a release process. A dbt change ships the minute it merges, and nothing checks that it won't break the team reading your tables downstream. Software solved this with staging and validation gates. Data mostly didn't. 🚢
+Data pipelines get deployed without a release process. A dbt change ships the minute it merges, and Airflow will run it on the next schedule whether or not it breaks the team reading your tables downstream. Nothing checks first. Software solved this with staging and validation gates. Data mostly didn't. 🚢
 
 This is a full migration. Two real dbt projects that run on separate Airflow schedules, moved onto **continuo**, a control plane that treats a data change like a release: validate the whole graph first, promote only if it's safe. By the end, the same breaking change that Airflow ships without a warning is a release continuo refuses.
 
