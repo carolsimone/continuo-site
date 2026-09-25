@@ -152,6 +152,6 @@ Four things continuo gives that two Airflows can't:
 
 ## Run it yourself
 
-Clone the two "before" repos, run `make break`, and watch finance fall over. Then install continuo and move the projects onto it, and watch the same change get stopped.
+Clone the two "before" repos, run `make break`, and watch finance fall over. Then install continuo and move the projects onto it, and watch the same change get stopped, then watch Agentic Remediation propose the verified fix as a pull request you can merge.
 
 [airflow-core-demo](https://github.com/carolsimone/airflow-core-demo) · [airflow-finance-demo](https://github.com/carolsimone/airflow-finance-demo) · [continuo-core-finance-demo](https://github.com/carolsimone/continuo-core-finance-demo)
