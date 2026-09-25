@@ -1,14 +1,14 @@
 ---
-title: "Migrating two dbt projects from Airflow to Continuo"
-description: "Two dbt teams on separate Airflows, one silent cross-team break, and the step-by-step move to Continuo, where that break becomes a rejected release instead of a Monday-morning incident."
+title: "Migrating two dbt projects from Airflow to continuo"
+description: "Two dbt teams on separate Airflows, one silent cross-team break, and the step-by-step move to continuo, where that break becomes a rejected release instead of a Monday-morning incident."
 date: 2026-09-05
 draft: false
 ---
 Data pipelines get deployed without a release process. A dbt change ships the minute it merges, and nothing checks that it won't break the team reading your tables downstream. Software solved this with staging and validation gates. Data mostly didn't. 🚢
 
-This is a full migration. Two real dbt projects that run on separate Airflow schedules, moved onto **Continuo**, a control plane that treats a data change like a release: validate the whole graph first, promote only if it's safe. By the end, the same breaking change that Airflow ships without a warning is a release Continuo refuses.
+This is a full migration. Two real dbt projects that run on separate Airflow schedules, moved onto **continuo**, a control plane that treats a data change like a release: validate the whole graph first, promote only if it's safe. By the end, the same breaking change that Airflow ships without a warning is a release continuo refuses.
 
-Everything runs on your machine. Three repos: two for the Airflow "before", one for the Continuo "after".
+Everything runs on your machine. Three repos: two for the Airflow "before", one for the continuo "after".
 
 ## The before: two teams, two schedulers, zero shared knowledge
 
@@ -65,9 +65,9 @@ make break   # core renames the column
 
 No alert fired. No release was blocked, because there was no release, just two cron jobs that met in a shared schema and hoped. The wrong number lands in a dashboard, and someone finds it the next morning. **Two separate schedulers cannot see across a team boundary.** That's not an Airflow bug. It's the missing layer. Let's add it.
 
-## Step 1: Install Continuo
+## Step 1: Install continuo
 
-You need a Continuo platform to migrate onto, and the same `helm install` brings it up on a laptop or in production. For this walkthrough, run it on a local cluster: one command installs Continuo and its bundled datastores. Follow **[Instantiate the Continuo platform](/docs/instantiate-continuo)** (about ten minutes), then come back here.
+You need a continuo platform to migrate onto, and the same `helm install` brings it up on a laptop or in production. For this walkthrough, run it on a local cluster: one command installs continuo and its bundled datastores. Follow **[Instantiate the continuo platform](/docs/instantiate-continuo)** (about ten minutes), then come back here.
 
 The local install is the quickstart, not a toy — the release flow below is identical in production. There you deploy the same chart to your own cluster, backed by your own Postgres, Redis, Neo4j and object store; the **[deploy guide](/docs/deploy)** covers that bring-your-own-datastores path. Nothing in this migration is local-only.
 
@@ -83,13 +83,13 @@ open http://localhost:8090
 
 ```
 
-## Step 2: Move the projects onto Continuo
+## Step 2: Move the projects onto continuo
 
-The dbt code doesn't change. The two projects move into one repo, [continuo-core-finance-demo](https://github.com/carolsimone/continuo-core-finance-demo), and release through Continuo instead of a cron. Per project it's three steps:
+The dbt code doesn't change. The two projects move into one repo, [continuo-core-finance-demo](https://github.com/carolsimone/continuo-core-finance-demo), and release through continuo instead of a cron. Per project it's three steps:
 
 1. **Take the dbt project as-is.** No model edits. The cross-service reference stays a plain `FROM analytics.revenue_per_user`.
 2. **Add a Dockerfile.** The project already builds as an image.
-3. **Replace the scheduler with a release.** Instead of a cron trigger, you POST a release to Continuo.
+3. **Replace the scheduler with a release.** Instead of a cron trigger, you POST a release to continuo.
 
 Point at the release API and release both services:
 
@@ -101,16 +101,16 @@ make release SERVICE=continuo-core    TAG=v1
 make release SERVICE=continuo-finance TAG=v1
 ```
 
-Each ends **promoted**, and there's the first win: there is no `03:00` for finance anymore. Continuo reads that finance depends on core and orders the build itself, the ordering two separate crons could only approximate.
+Each ends **promoted**, and there's the first win: there is no `03:00` for finance anymore. continuo reads that finance depends on core and orders the build itself, the ordering two separate crons could only approximate.
 
-| Service | Continuo | Status |
+| Service | continuo | Status |
 |---|---|---|
 | continuo-core | validated across the graph, then promoted | ✅ promoted |
 | continuo-finance | reads core's `revenue_per_user`; sequenced after it | ✅ promoted |
 
-Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.) One run, both services, in one graph: core's nodes and finance's in their own lanes, with the cross-service edges Continuo sequenced on.
+Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.) One run, both services, in one graph: core's nodes and finance's in their own lanes, with the cross-service edges continuo sequenced on.
 
-![Continuo's run view: the daily schedule at 13/13 nodes succeeded, core 5/5 and finance 8/8 in separate swim lanes, dependency edges crossing between them](/blog/airflow-to-continuo/continuo-run-swimlanes.png)
+![continuo's run view: the daily schedule at 13/13 nodes succeeded, core 5/5 and finance 8/8 in separate swim lanes, dependency edges crossing between them](/blog/airflow-to-continuo/continuo-run-swimlanes.png)
 
 ## Step 3: The same break, rejected before it ships
 
@@ -120,37 +120,37 @@ Now make the *exact* change that broke finance on Airflow: rename `revenue_per_u
 make release SERVICE=continuo-core TAG=v2
 ```
 
-This time it is **rejected**. Continuo validates core against the whole topology, sees that `continuo-finance`'s `ltv_per_user` still reads `revenue_eur`, and refuses to promote. Production never changes: `current-prod` still points at the last good release.
+This time it is **rejected**. continuo validates core against the whole topology, sees that `continuo-finance`'s `ltv_per_user` still reads `revenue_eur`, and refuses to promote. Production never changes: `current-prod` still points at the last good release.
 
-| Node | What Continuo saw | Status |
+| Node | What continuo saw | Status |
 |---|---|---|
 | continuo-core | rename validated across the graph → finance would break | ❌ rejected |
 | production | `current-prod` unchanged, the bad release never shipped | ✅ safe |
 
-![Continuo's Releases tab: core v2 rejected on validation while production stays on the last good finance release](/blog/airflow-to-continuo/continuo-rejected.png)
+![continuo's Releases tab: core v2 rejected on validation while production stays on the last good finance release](/blog/airflow-to-continuo/continuo-rejected.png)
 
-Airflow found the break at 03:00, in production, in finance's data. Continuo found it at release, in a shadow, before anything shipped.
+Airflow found the break at 03:00, in production, in finance's data. continuo found it at release, in a shadow, before anything shipped.
 
-## Step 4: Continuo proposes the fix
+## Step 4: continuo proposes the fix
 
-A rejected release tells you something broke. Continuo can also try to fix it. When the release is rejected, its remediation agent classifies the failure, reads the *changed* model's source at `repo@commit_sha`, and asks an LLM for a repair, then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
+A rejected release tells you something broke. continuo can also try to fix it. When the release is rejected, its remediation agent classifies the failure, reads the *changed* model's source at `repo@commit_sha`, and asks an LLM for a repair, then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
 
 For this break, it edited core's `revenue_per_user` and kept both column names: the new `net_revenue_eur` and `revenue_eur` back as an alias, so finance's `ltv_per_user` reads again without finance changing a line. Verified by a live dbt run, confidence **high**, one click from a PR:
 
-![Continuo's remediation proposal: status proposed, confidence high, verification passed; the agent adds revenue_eur back as an alias in core's revenue_per_user so finance reads again, with a Create PR button](/blog/airflow-to-continuo/continuo-remediation-proposal.png)
+![continuo's remediation proposal: status proposed, confidence high, verification passed; the agent adds revenue_eur back as an alias in core's revenue_per_user so finance reads again, with a Create PR button](/blog/airflow-to-continuo/continuo-remediation-proposal.png)
 
 The fix lands in the service that changed, core, because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs two credentials the rest of the demo doesn't (an LLM key to write the fix, a read-only GitHub token to read the source); the **[platform guide](/docs/run-projects-in-continuo)** walks through both, plus the GitHub App that turns *Create PR* into a real pull request.
 
 ## Why it's better: dependencies, deployment, and integration
 
-Three things Continuo gives that two Airflows can't:
+Three things continuo gives that two Airflows can't:
 
-- **Cross-service dependencies.** core and finance depend on each other across projects (core reads a finance table; finance reads a core table). On Airflow that mesh had no run order two cron schedules could express, so you scheduled an hour apart and hoped. Continuo orders it from the dependency graph itself, every release.
+- **Cross-service dependencies.** core and finance depend on each other across projects (core reads a finance table; finance reads a core table). On Airflow that mesh had no run order two cron schedules could express, so you scheduled an hour apart and hoped. continuo orders it from the dependency graph itself, every release.
 - **Deployment.** A change is validated against the *whole* topology before it promotes, blue/green. The rename wasn't wrong: teams rename columns every week. What was missing was the gate every software deploy has and most data pipelines don't: something that looks at the whole graph and says "not yet" before a change lands. 🔒
 - **Integration.** Plugging a project in takes one endpoint. Your CI pushes the image to the registry you already use, then POSTs the service name and image tag to the platform's `/releases` endpoint. That's the whole contract: no DAG to write, no scheduler to run or upgrade, no change to the dbt code.
 
 ## Run it yourself
 
-Clone the two "before" repos, run `make break`, and watch finance fall over. Then install Continuo and move the projects onto it, and watch the same change get stopped.
+Clone the two "before" repos, run `make break`, and watch finance fall over. Then install continuo and move the projects onto it, and watch the same change get stopped.
 
 [airflow-core-demo](https://github.com/carolsimone/airflow-core-demo) · [airflow-finance-demo](https://github.com/carolsimone/airflow-finance-demo) · [continuo-core-finance-demo](https://github.com/carolsimone/continuo-core-finance-demo)
