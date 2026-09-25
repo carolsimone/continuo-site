@@ -65,9 +65,23 @@ make break   # core renames the column
 
 No alert fired. No release was blocked, because there was no release, just two cron jobs that met in a shared schema and hoped. The wrong number lands in a dashboard, and someone finds it the next morning. **Two separate schedulers cannot see across a team boundary.** That's not an Airflow bug. It's the missing layer. Let's add it.
 
-## Step 1: Stand up Continuo
+## Step 1: Install Continuo
 
-You need a Continuo platform to migrate onto, and it runs on your laptop: one `helm install` on a local cluster brings up Continuo and its datastores. Follow **[Instantiate the Continuo platform](/docs/instantiate-continuo)** (about ten minutes), then come back here.
+You need a Continuo platform to migrate onto, and the same `helm install` brings it up on a laptop or in production. For this walkthrough, run it on a local cluster: one command installs Continuo and its bundled datastores. Follow **[Instantiate the Continuo platform](/docs/instantiate-continuo)** (about ten minutes), then come back here.
+
+The local install is the quickstart, not a toy — the release flow below is identical in production. There you deploy the same chart to your own cluster, backed by your own Postgres, Redis, Neo4j and object store; the **[deploy guide](/docs/deploy)** covers that bring-your-own-datastores path. Nothing in this migration is local-only.
+
+Remember to port-forward your cluster's ui service to localhost if you are building locally and want to have the ui available to you:
+
+```
+kubectl -n continuo port-forward svc/ui 8090:8090 &
+kubectl -n continuo port-forward svc/continuo-dex 5556:5556 &
+echo "127.0.0.1 continuo-dex" | sudo tee -a /etc/hosts
+
+# Log in with admin@example.com / password.
+open http://localhost:8090
+
+```
 
 ## Step 2: Move the projects onto Continuo
 
@@ -137,6 +151,6 @@ Three things Continuo gives that two Airflows can't:
 
 ## Run it yourself
 
-Clone the two "before" repos, run `make break`, and watch finance fall over. Then stand up Continuo and move the projects onto it, and watch the same change get stopped.
+Clone the two "before" repos, run `make break`, and watch finance fall over. Then install Continuo and move the projects onto it, and watch the same change get stopped.
 
 [airflow-core-demo](https://github.com/carolsimone/airflow-core-demo) · [airflow-finance-demo](https://github.com/carolsimone/airflow-finance-demo) · [continuo-core-finance-demo](https://github.com/carolsimone/continuo-core-finance-demo)
