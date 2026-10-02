@@ -31,6 +31,7 @@ git clone https://github.com/carolsimone/airflow-core-demo
 cd airflow-core-demo && make up
 
 # the finance team's Airflow, separate stack, same warehouse
+cd ..
 git clone https://github.com/carolsimone/airflow-finance-demo
 cd airflow-finance-demo && make up
 ```
@@ -44,6 +45,8 @@ Give each scheduler a minute to parse its DAG, then open both Airflow UIs:
 
 Why `127.0.0.1` for finance: browsers share cookies across ports, so two Airflows on `localhost` keep logging each other out. A different host name gives each UI its own session.
 
+Each scheduler runs its DAG once as soon as it has parsed it, so both UIs show a green run within a couple of minutes.
+
 ## The break: core changes one column, finance breaks, nobody knows
 
 core renames a column: `revenue_eur` becomes `net_revenue_eur`. A reasonable change: the number is net of fees now, and the name should say so. core updates its model, its tests, its docs. core's pipeline runs green. Every check core owns passes.
@@ -51,10 +54,15 @@ core renames a column: `revenue_eur` becomes `net_revenue_eur`. A reasonable cha
 An hour later, finance fires. Its `ltv_per_user` model still does `SELECT revenue_eur`, and that column is gone. 💥
 
 ```bash
+cd ../airflow-core-demo
 make break   # core renames the column
-# core's run:    success, every core test passes
-# finance's run: ERROR: column "revenue_eur" does not exist
+make run     # core's run: success, every core test passes
+
+cd ../airflow-finance-demo
+make run     # finance's run: ERROR: column "revenue_eur" does not exist
 ```
+
+`make run` triggers the team's DAG now instead of waiting for its 02:00 or 03:00 slot.
 
 | Team | What happened | Status |
 |---|---|---|
@@ -76,7 +84,7 @@ Remember to port-forward your cluster's ui service to localhost if you are build
 ```
 kubectl -n continuo port-forward svc/ui 8090:8090 &
 kubectl -n continuo port-forward svc/continuo-dex 5556:5556 &
-echo "127.0.0.1 continuo-dex" | sudo tee -a /etc/hosts
+grep -q "continuo-dex" /etc/hosts || echo "127.0.0.1 continuo-dex" | sudo tee -a /etc/hosts
 
 # Log in with admin@example.com / password.
 open http://localhost:8090
@@ -106,7 +114,7 @@ make release SERVICE=continuo-core    TAG=v1
 make release SERVICE=continuo-finance TAG=v1
 ```
 
-If `echo $CONTINUO_TOKEN` prints `null`, the login failed: check that the Dex port-forward is running. The token is yours, as an operator, and lasts an hour; when a call answers `401`, run the `export CONTINUO_TOKEN=...` command again. Each `make release` builds the image, loads it into the cluster and POSTs `/api/v1/releases` with the `release_id`, `service` and `image_tag`, plus the `repo` and `commit_sha` that say where the release came from (a person supplies them; a pipeline's GitHub Actions token carries them itself). The first release of each service finds production unseeded and bootstraps: it promotes without validation. You can read what production is running at any time:
+If `echo $CONTINUO_TOKEN` prints `null`, the login failed: check that the Dex port-forward is running. The token is yours, as an operator, and lasts an hour; when a call answers `401`, run the `export CONTINUO_TOKEN=...` command again. Each `make release` builds the image, loads it into the cluster and POSTs `/api/v1/releases` with the `release_id`, `service` and `image_tag`, plus the `repo` and `commit_sha` that say where the release came from (a person supplies them; a pipeline's GitHub Actions token carries them itself). The first release, core's, finds production unseeded and bootstraps: it promotes without validation. Every release after it, finance's included, is validated against the whole graph before it promotes. You can read what production is running at any time:
 
 ```bash
 curl -s -H "Authorization: Bearer $CONTINUO_TOKEN" $API/current-prod | jq
@@ -116,8 +124,8 @@ Each ends **promoted**, and there's the first win: there is no `03:00` for finan
 
 | Service | continuo | Status |
 |---|---|---|
-| continuo-core | validated across the graph, then promoted | ✅ promoted |
-| continuo-finance | reads core's `revenue_per_user`; sequenced after it | ✅ promoted |
+| continuo-core | first release: bootstraps an empty production | ✅ promoted |
+| continuo-finance | reads core's `revenue_per_user`; validated across the graph, then promoted | ✅ promoted |
 
 Then trigger a run of the `daily` schedule from the UI so the tables are built. (The [platform guide](/docs/instantiate-continuo) covers logging in.) One run, both services, in one graph: core's nodes and finance's in their own lanes, with the cross-service edges continuo sequenced on.
 
@@ -125,7 +133,7 @@ Then trigger a run of the `daily` schedule from the UI so the tables are built. 
 
 ## Step 3: The same break, rejected before it ships
 
-Now make the *exact* change that broke finance on Airflow: rename `revenue_per_user`'s output column `revenue_eur` in `services/continuo-core`, and release core again:
+Now make the *exact* change that broke finance on Airflow: rename `revenue_per_user`'s output column `revenue_eur` to `net_revenue_eur` in `services/continuo-core` (the repo's README has the three `sed` lines that make the change), and release core again:
 
 ```bash
 make release SERVICE=continuo-core TAG=v2
@@ -144,13 +152,13 @@ Airflow found the break at 03:00, in production, in finance's data. continuo fou
 
 ## Step 4: Agentic Remediation proposes the fix
 
-A rejected release tells you something broke. continuo can also try to fix it. When the release is rejected, continuo's **Agentic Remediation** classifies the failure, reads the *changed* model's source at `repo@commit_sha`, and asks an LLM for a repair, then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
+A rejected release tells you something broke. continuo can also try to fix it. When the release is rejected, continuo's **Agentic Remediation** classifies the failure, reads the *changed* model's source from the release it compiled, and asks an LLM for a repair, then runs a **real validation** to prove the fix works before showing it to you. It never writes to your repo: the output is a diff you review and a pull request you choose to open. 🤖
 
 For this break, it edited core's `revenue_per_user` and kept both column names: the new `net_revenue_eur` and `revenue_eur` back as an alias, so finance's `ltv_per_user` reads again without finance changing a line. Verified by a live dbt run, confidence **high**, one click from a PR:
 
 ![continuo's remediation proposal: status proposed, confidence high, verification passed; the agent adds revenue_eur back as an alias in core's revenue_per_user so finance reads again, with a Create PR button](/blog/airflow-to-continuo/continuo-remediation-proposal.png)
 
-The fix lands in the service that changed, core, because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs two credentials the rest of the demo doesn't (an LLM key to write the fix, a read-only GitHub token to read the source); the **[platform guide](/docs/run-projects-in-continuo)** walks through both, plus the GitHub App that turns *Create PR* into a real pull request.
+The fix lands in the service that changed, core, because the downstream model in finance *can't* change in this release: its own fix could never ship ahead of the change that broke it. This step needs one credential the rest of the demo doesn't: an LLM key to write the fix. The **[platform guide](/docs/run-projects-in-continuo)** shows where it goes, plus the GitHub App that turns *Create PR* into a real pull request against your repository.
 
 ## Why it's better: dependencies, deployment, integration, and Agentic Remediation
 
