@@ -35,7 +35,9 @@ jobs:
       - name: Check internal links and anchors
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --root-dir ./dist --include-fragments './dist/**/*.html'
+          # Pages are served as directories (docs/deploy -> docs/deploy/index.html), so
+          # a link such as /docs/deploy#section needs the index file to find its anchor.
+          args: --offline --root-dir ./dist --include-fragments --index-files=index.html './dist/**/*.html'
           fail: true
 
       - name: Ping IndexNow
