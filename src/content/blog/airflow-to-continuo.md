@@ -91,14 +91,25 @@ The dbt code doesn't change. The two projects move into one repo, [continuo-core
 2. **Add a Dockerfile.** The project already builds as an image.
 3. **Replace the scheduler with a release.** Instead of a cron trigger, you POST a release to continuo.
 
-Point at the release API and release both services:
+continuo's release API is public: the `ui` serves it at `/api/v1`, behind the same login as the dashboard. With the `ui` and Dex port-forwards from Step 1 running, ask Dex for an operator's ID token (the demo account's password is `password`), then release both services:
 
 ```bash
-kubectl -n continuo port-forward svc/release-controller 8088:8088 &
+CLIENT_SECRET=$(kubectl -n continuo get secret continuo-dex -o jsonpath='{.data.client-secret}' | base64 -d)
+export CONTINUO_TOKEN=$(curl -s -u "continuo-ui:${CLIENT_SECRET}" http://localhost:5556/dex/token \
+  -d grant_type=password -d scope="openid email profile" \
+  -d username=admin@example.com -d password=password | jq -r .id_token)
+export API=http://localhost:8090/api/v1
+
 git clone https://github.com/carolsimone/continuo-core-finance-demo
 cd continuo-core-finance-demo
 make release SERVICE=continuo-core    TAG=v1
 make release SERVICE=continuo-finance TAG=v1
+```
+
+If `echo $CONTINUO_TOKEN` prints `null`, the login failed: check that the Dex port-forward is running. The token is yours, as an operator, and lasts an hour; when a call answers `401`, run the `export CONTINUO_TOKEN=...` command again. Each `make release` builds the image, loads it into the cluster and POSTs `/api/v1/releases` with the `release_id`, `service` and `image_tag`, plus the `repo` and `commit_sha` that say where the release came from (a person supplies them; a pipeline's GitHub Actions token carries them itself). The first release of each service finds production unseeded and bootstraps: it promotes without validation. You can read what production is running at any time:
+
+```bash
+curl -s -H "Authorization: Bearer $CONTINUO_TOKEN" $API/current-prod | jq
 ```
 
 Each ends **promoted**, and there's the first win: there is no `03:00` for finance anymore. continuo reads that finance depends on core and orders the build itself, the ordering two separate crons could only approximate.
@@ -147,7 +158,7 @@ Four things continuo gives that two Airflows can't:
 
 - **Cross-service dependencies.** core and finance depend on each other across projects (core reads a finance table; finance reads a core table). On Airflow that mesh had no run order two cron schedules could express, so you scheduled an hour apart and hoped. continuo orders it from the dependency graph itself, every release.
 - **Deployment.** A change is validated against the *whole* topology before it promotes, blue/green. The rename wasn't wrong: teams rename columns every week. What was missing was the gate every software deploy has and most data pipelines don't: something that looks at the whole graph and says "not yet" before a change lands. 🔒
-- **Integration.** Plugging a project in takes one endpoint. Your CI builds the image and pushes it to the registry you already use; then, at CD time, you POST the service name and image tag to the platform's `/releases` endpoint. That's the whole contract: no DAG to write, no scheduler to run or upgrade, no change to the dbt code.
+- **Integration.** Plugging a project in takes one endpoint. Your CI builds the image and pushes it to the registry you already use; then, at CD time, you POST the service name and image tag to the platform's `/api/v1/releases` endpoint, authenticated with the pipeline's GitHub Actions token: no kubeconfig and no stored secret. That's the whole contract: no DAG to write, no scheduler to run or upgrade, no change to the dbt code.
 - **Agentic Remediation.** A rejected release isn't a dead end. continuo's agent reads the changed model, asks an LLM for a repair, and proves it with a real validation run before it shows you anything: the output is a diff you review and a one-click pull request, never a write to your repo. Airflow tells you what broke, after it broke. continuo proposes the fix before anything ships. 🤖
 
 ## Run it yourself
