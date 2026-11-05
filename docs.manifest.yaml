@@ -12,6 +12,9 @@ docs:
   - path: deploy/README.md
     slug: deploy
     title: Deploy to K8s
+  - path: deploy/CREDENTIALS.md
+    slug: credentials
+    title: Credentials
   - path: docs/roadmap.md
     slug: roadmap
     title: Roadmap
